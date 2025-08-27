@@ -29,7 +29,7 @@ async ({event}) => {
 
 export const syncUserUpdation = inngest.createFunction(
   {
-    id : 'sync-user-from-clerk'
+    id : 'update-user-from-clerk'
   },
   {
     event : 'clerk/user.updated'
@@ -49,7 +49,7 @@ export const syncUserUpdation = inngest.createFunction(
 
 export const syncUserDeletion = inngest.createFunction(
   {
-    id : 'sync-user-from-clerk'
+    id : 'delete-user-with-clerk'
   },
   {
     event : 'clerk/user.deleted'
