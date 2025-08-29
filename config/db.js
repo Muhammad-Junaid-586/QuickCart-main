@@ -18,7 +18,12 @@ async function connectDB() {
       throw new Error("❌ MONGODB_URI is not defined in the environment");
     }
 
-    cached.promise = mongoose.connect(process.env.MONGODB_URI, opts).then((mongoose) => mongoose);
+    cached.promise = mongoose
+      .connect(process.env.MONGODB_URI, opts)
+      .then((mongoose) => {
+        console.log("✅ Connected to MongoDB from db.js");
+        return mongoose; // ✅ You must return the mongoose connection here
+      });
   }
 
   cached.conn = await cached.promise;

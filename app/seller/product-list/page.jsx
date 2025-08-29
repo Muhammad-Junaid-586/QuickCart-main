@@ -5,22 +5,48 @@ import Image from "next/image";
 import { useAppContext } from "@/context/AppContext";
 import Footer from "@/components/seller/Footer";
 import Loading from "@/components/Loading";
+import toast from "react-hot-toast";
+import axios from "axios";
 
 const ProductList = () => {
 
-  const { router } = useAppContext()
+  const { router, user , getToken } = useAppContext()
 
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
 
   const fetchSellerProduct = async () => {
-    setProducts(productsDummyData)
-    setLoading(false)
+  try {
+    const token = await getToken()
+    const {data} = await axios.get(`/api/product/seller-list`, {
+      headers : {
+        Authorization : `Bearer ${token}`
+      }
+    })
+    if (data.success) {
+      console.log('data is successfully loaded');
+      
+      setProducts(data.products)
+      setLoading(false)
+    }else{
+      console.log('failed to fetch data');
+      
+      toast.error(data.message)
+    }
+  } catch (err) {
+    console.error("Error in /api/product/list:", err);
+    toast.error(err.message)
   }
 
+}
   useEffect(() => {
-    fetchSellerProduct();
-  }, [])
+    if (user) {
+      
+      fetchSellerProduct();
+    }
+  }, [user])
+
+
 
   return (
     <div className="flex-1 min-h-screen flex flex-col justify-between">
@@ -77,5 +103,6 @@ const ProductList = () => {
     </div>
   );
 };
+
 
 export default ProductList;
