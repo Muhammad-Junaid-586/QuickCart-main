@@ -79,19 +79,51 @@ export const createUserOrder = inngest.createFunction(
     timeout : '5s'
   } },
   { event: "order/created" },
+  // async ({ events }) => {
+  //   const orders = events.map((event) => {
+  //     return {
+  //       userId: event.data.userId,
+  //       items : event.data.items,
+  //       amount : event.data.amount,
+  //       address : event.data.address,
+  //       date : event.data.date
+  //     };
+  //   });
+
+  //   await connectDB();
+  //   await Order.create(orders);
+  //   return { success: true, message: "Orders created successfully" ,processed : orders.length };
+  // }
+
   async ({ events }) => {
+  try {
+    await connectDB();
+    console.log("RAW EVENTS RECEIVED:", JSON.stringify(events, null, 2));
+    
     const orders = events.map((event) => {
+      console.log("Processing event:", event);
+      console.log("Event data contains userId:", event.data.hasOwnProperty('userId'));
+      console.log("Event data contains user_id:", event.data.hasOwnProperty('user_id'));
+      
       return {
-        userId: event.data.user_id,
-        items : event.data.items,
-        amount : event.data.amount,
-        address : event.data.address,
-        date : event.data.date
+        userId: event.data.userId || event.data.user_id, // Try both possibilities
+        items: event.data.items,
+        amount: event.data.amount,
+        address: event.data.address,
+        date: event.data.date,
+        status: "Order Placed"
       };
     });
 
-    await connectDB();
-    await Order.create(orders);
-    return { success: true, message: "Orders created successfully" ,processed : orders.length };
+    console.log("Processed orders:", orders);
+    
+    const result = await Order.create(orders);
+    console.log("MongoDB creation result:", result);
+    
+    return { success: true, message: "Orders created successfully", processed: orders.length };
+  } catch (error) {
+    console.error("Error creating orders:", error);
+    throw error;
   }
+}
 )
