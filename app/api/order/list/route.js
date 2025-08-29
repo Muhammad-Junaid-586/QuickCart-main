@@ -32,9 +32,9 @@ export async function GET(request) {
 
     // Try populating with the exact model names
     const orders = await Order.find({ userId })
-      .populate("items.product")  // Try simple populate first
-      .populate("address")
-      .sort({ date: -1 });
+      .populate("address items.product")  // Try simple populate first
+      
+      
 
     console.log('Populated orders:', orders);
     
